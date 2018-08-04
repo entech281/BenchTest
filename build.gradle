@@ -1,9 +1,17 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-3"
+    id "findbugs"
+    id "jacoco"
+    id 'com.github.ksoichiro.console.reporter' version '0.5.0'
 }
 
-def ROBOT_CLASS = "frc.robot.Robot"
+allprojects {
+    repositories { mavenCentral() }
+}
+
+def TEAM = 281
+def ROBOT_CLASS = "frc.team281.Robot"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
@@ -13,8 +21,8 @@ deploy {
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
-            // want to store a team number in this file.
-            team = getTeamNumber()
+            // want to store a team number in this file.          
+            team = TEAM
         }
     }
     artifacts {
@@ -32,6 +40,9 @@ dependencies {
     compile wpilib()
     compile ctre()
     compile navx()
+
+    testCompile 'junit:junit:4.12'
+    testCompile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -52,3 +63,29 @@ compileJava {
 wrapper {
     gradleVersion = '4.9'
 }
+
+jacoco {
+    toolVersion = "0.8.1"
+    reportsDir = file("$buildDir/jacocoHtml")
+}
+
+findbugs{
+    ignoreFailures = false
+    reportLevel = "high"
+}
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+

@@ -1,0 +1,11 @@
+language: java
+install: true
+cache:
+  directories:
+  - /home/travis/.gradle
+
+script: # Modify the commands below to build your repository.
+  - ./gradlew clean build jacocoTestReport
+
+notifications:
+  slack: team281programming:mpBJ2mwOFaAywAQDGPA2GV8d
