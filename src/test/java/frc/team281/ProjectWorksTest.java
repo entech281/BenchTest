@@ -14,6 +14,6 @@ public class ProjectWorksTest {
 
     @Test
     public void testThatTheProjectCanRunUnit() {
-        assertEquals(1, 1);
+        assertEquals(1, 2);
     }
 }
