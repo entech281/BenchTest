@@ -1,20 +1,20 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LinearAxis{
 
-    public double length;
-    public double conversion;
-    public double location;
-    public double speed;
-
-    private double currentJob;
+    private double length;
+    private double conversion;
+    private double location = 0;
+    private double speed;
+    private double currentJob = -1;
     private double tolerance;
+    private boolean disabled = false;
     private boolean topLimitSwitchPressed;
     private boolean bottomLimitSwitchPressed;
-    private ArrayList<String> errors;
-    private ArrayList<String> warnings;
+    private List<String> errors   = new ArrayList<String>();
 
     public LinearAxis(double length, double speed, double conversion, double tolerance){
         this.length = length;
@@ -22,32 +22,19 @@ public class LinearAxis{
         this.conversion = conversion;
         this.location = 0;
         this.tolerance = tolerance;
-        this.currentJob = -1;
-        this.errors =  new ArrayList<String>();
-        this.warnings =  new ArrayList<String>();
-    }
-
-    public LinearAxis(double length, double speed, double conversion,double tolerence, double location){
-        this.length = length;
-        this.speed = speed;
-        this.conversion = conversion;
-        this.location = location;
-        this.tolerance = tolerence;
-        this.currentJob = -1;
-        this.errors =  new ArrayList<String>();
     }
 
     private double getDiff(){
-        return this.currentJob-this.location;
+        return currentJob-location;
     }
 
     private boolean positionWithinTolerence(){
-        return Math.abs(getDiff()) < this.tolerance;
+        return Math.abs(getDiff()) < tolerance;
     }
 
     public boolean setJob(double position){
-        if(position > 0 && position < this.length){
-            this.currentJob = position;
+        if(position > 0 && position < length){
+            currentJob = position;
             return true;
         }
         return false;
@@ -58,43 +45,45 @@ public class LinearAxis{
     }
 
     public boolean hasErrors(){
-        return !this.errors.isEmpty();
+        return !errors.isEmpty();
     }
 
-    public ArrayList<String> getErrors(){
-        return this.errors;
+    public List<String> getErrors(){
+        return errors;
     }
 
     public double getVelocity(){
-        if(this.currentJob == -1||positionWithinTolerence()||this.hasErrors()){
+        if(currentJob == -1||positionWithinTolerence()||disabled){
             return 0;
-        } else if(this.getDiff() < 0 && !this.topLimitSwitchPressed) {
-            return -this.speed;
-        } else if(this.getDiff() > 0 && !this.bottomLimitSwitchPressed) {
-            return this.speed;
+        } else if(getDiff() < 0 && !topLimitSwitchPressed) {
+            return -speed;
+        } else if(getDiff() > 0 && !bottomLimitSwitchPressed) {
+            return speed;
         }
         return 0;
     }
 
     public void update(int encoderClicks, boolean topLimitSwitch, boolean bottomLimitSwitch){
         
-        this.location += this.conversion*encoderClicks;
-        this.topLimitSwitchPressed    = topLimitSwitch;
-        this.bottomLimitSwitchPressed = bottomLimitSwitch;
+        location  += conversion*encoderClicks;
+        topLimitSwitchPressed    = topLimitSwitch;
+        bottomLimitSwitchPressed = bottomLimitSwitch;
 
         if(topLimitSwitch&&bottomLimitSwitch){
-            this.errors.add("Both limit switches seem to be pressed. Stopping.");
+            errors.add("Both limit switches seem to be pressed. Stopping.");
         }
-        if(this.location > this.length + this.tolerance && !topLimitSwitch){
+        if(location > length + tolerance && !topLimitSwitch){
             //checks to see if length is too
-            this.errors.add("Top limit switch not triggered and shuttle past declared length. Stopping.");
+            disabled = true;
+            errors.add("Top limit switch not triggered and shuttle past declared length. Stopping.");
         }
-        if(this.location < -this.tolerance && !bottomLimitSwitch){
-            this.errors.add("Bottom limit switch not triggered and shuttle position below zero. Stopping.");
+        if(location < -tolerance && !bottomLimitSwitch){
+            disabled = true;
+            errors.add("Bottom limit switch not triggered and shuttle position below zero. Stopping.");
         }
-        if(topLimitSwitch && this.location < this.length - this.tolerance){
-            //this.errors.add("Limit switch pressed before estimated size. Updating size to " + this.location+ ".");
-            this.length = this.location;
+        if(topLimitSwitch && location < length - tolerance){
+            this.errors.add("Limit switch pressed before estimated size. Updating size to " + this.location+ ".");
+            length = location;
         }
     }
 
