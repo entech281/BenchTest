@@ -20,36 +20,89 @@ public class LinearAxis{
         this.length = length;
         this.speed = speed;
         this.conversion = conversion;
-        this.location = 0;
         this.tolerance = tolerance;
     }
-
-    private double getDiff(){
-        return currentJob-location;
+    
+    public double getLength(){
+        return length;
     }
 
-    private boolean positionWithinTolerence(){
-        return Math.abs(getDiff()) < tolerance;
+    public double getConversion(){
+        return conversion;
     }
 
-    public boolean setJob(double position){
+    public double getLocation(){
+        return location;
+    }
+
+    public boolean setLocation(double d){
+        if(d > 0 && d < length){
+            location = d;
+            return true;
+        }
+        return false;
+    }
+
+    public double getSpeed(){
+        return speed;
+    }
+
+    public double getCurrentJob(){
+        return currentJob;
+    }
+    
+    public void cancelJob(){
+        this.currentJob = -1;
+    }
+    
+    public boolean setCurrentJob(double position){
         if(position > 0 && position < length){
             currentJob = position;
             return true;
         }
         return false;
     }
-
-    public void cancelJob(){
-        this.currentJob = -1;
+    public double getTolerence(){
+        return tolerance;
     }
 
-    public boolean hasErrors(){
-        return !errors.isEmpty();
+    public boolean getDisabled(){
+        return disabled;
+    }
+
+    public void setDisabledTrue(){
+        errors.add("setDisabledTrue was called. Disabling.");
+        disabled = true;
+    }
+
+    public void setDisabledTrue(String message){
+        errors.add("setDisabledTrue was called. The message was: " + message + ". Disabling.");
+        disabled = true;
+    }
+
+    public boolean getBottomLimitSwitch(){
+        return bottomLimitSwitchPressed;
+    }
+
+    public boolean getTopLimitSwitch(){
+        return topLimitSwitchPressed;
     }
 
     public List<String> getErrors(){
         return errors;
+    }
+
+    private double getDiff(){
+        return currentJob-location;
+    }
+    private boolean positionWithinTolerence(){
+        return Math.abs(getDiff()) < tolerance;
+    }
+
+
+
+    public boolean hasErrors(){
+        return !errors.isEmpty();
     }
 
     public double getVelocity(){
@@ -85,6 +138,7 @@ public class LinearAxis{
             this.errors.add("Limit switch pressed before estimated size. Updating size to " + this.location+ ".");
             length = location;
         }
+        
     }
 
 }
