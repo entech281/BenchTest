@@ -99,8 +99,6 @@ public class LinearAxis{
         return Math.abs(getDiff()) < tolerance;
     }
 
-
-
     public boolean hasErrors(){
         return !errors.isEmpty();
     }
