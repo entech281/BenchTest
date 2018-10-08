@@ -95,7 +95,7 @@ public class LinearAxis{
     private double getDiff(){
         return currentJob-location;
     }
-    private boolean positionWithinTolerence(){
+    public boolean positionWithinTolerence(){
         return Math.abs(getDiff()) < tolerance;
     }
 
@@ -124,7 +124,6 @@ public class LinearAxis{
             errors.add("Both limit switches seem to be pressed. Stopping.");
         }
         if(location > length + tolerance && !topLimitSwitch){
-            //checks to see if length is too
             disabled = true;
             errors.add("Top limit switch not triggered and shuttle past declared length. Stopping.");
         }
